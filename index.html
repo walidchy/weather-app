@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style-mobile.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
@@ -19,6 +19,9 @@
             <div class="shape shape-2"></div>
             <div class="shape shape-3"></div>
         </div>
+        
+        <!-- Interactive Elements -->
+        <div id="cursor-glow"></div>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -34,7 +37,7 @@
             <!-- Search Section -->
             <section class="search-section">
                 <form class="search-form" id="searchForm">
-                    <div class="search-container">
+                    <div class="search-container glass">
                         <input 
                             type="text" 
                             id="cityInput" 
@@ -72,7 +75,7 @@
             <!-- Weather Display -->
             <section class="weather-section" id="weatherSection">
                 <!-- Current Weather Card -->
-                <div class="weather-card main-weather-card">
+                <div class="weather-card main-weather-card glass" id="mainCard">
                     <div class="weather-header">
                         <div class="location-info">
                             <h2 class="city-name" id="cityName">London</h2>
@@ -99,7 +102,7 @@
 
                 <!-- Weather Details Grid -->
                 <div class="weather-details-grid">
-                    <div class="detail-card">
+                    <div class="detail-card glass">
                         <i class="fas fa-tint detail-icon"></i>
                         <div class="detail-content">
                             <p class="detail-label">Humidity</p>
@@ -107,7 +110,7 @@
                         </div>
                     </div>
 
-                    <div class="detail-card">
+                    <div class="detail-card glass">
                         <i class="fas fa-wind detail-icon"></i>
                         <div class="detail-content">
                             <p class="detail-label">Wind Speed</p>
@@ -115,7 +118,7 @@
                         </div>
                     </div>
 
-                    <div class="detail-card">
+                    <div class="detail-card glass">
                         <i class="fas fa-eye detail-icon"></i>
                         <div class="detail-content">
                             <p class="detail-label">Visibility</p>
@@ -123,7 +126,7 @@
                         </div>
                     </div>
 
-                    <div class="detail-card">
+                    <div class="detail-card glass">
                         <i class="fas fa-thermometer-half detail-icon"></i>
                         <div class="detail-content">
                             <p class="detail-label">Pressure</p>
@@ -131,7 +134,7 @@
                         </div>
                     </div>
 
-                    <div class="detail-card">
+                    <div class="detail-card glass">
                         <i class="fas fa-sun detail-icon"></i>
                         <div class="detail-content">
                             <p class="detail-label">Sunrise</p>
@@ -139,7 +142,7 @@
                         </div>
                     </div>
 
-                    <div class="detail-card">
+                    <div class="detail-card glass">
                         <i class="fas fa-moon detail-icon"></i>
                         <div class="detail-content">
                             <p class="detail-label">Sunset</p>
@@ -159,3 +162,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
