@@ -75,6 +75,85 @@ class WeatherApp {
                 this.elements.searchForm.dispatchEvent(new Event('submit'));
             }
         });
+        
+        // 3D Tilt Effect for premium feel 
+        const mainCard = document.getElementById('mainCard') || document.querySelector('.main-weather-card');
+        if (mainCard) {
+            mainCard.addEventListener('mousemove', (e) => {
+                const rect = mainCard.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -10; // Max 10 deg
+                const rotateY = ((x - centerX) / centerX) * 10;
+                
+                mainCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                mainCard.style.transition = 'transform 0.1s ease';
+            });
+            
+            mainCard.addEventListener('mouseleave', () => {
+                mainCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                mainCard.style.transition = 'transform 0.5s ease';
+            });
+        }
+        
+        // Global Parallax and Cursor Glow
+        const cursorGlow = document.getElementById('cursor-glow');
+        document.addEventListener('mousemove', (e) => {
+            // Global background parallax
+            const x = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            document.documentElement.style.setProperty('--mouse-x', x);
+            document.documentElement.style.setProperty('--mouse-y', y);
+            
+            // Cursor glow element position
+            if (cursorGlow) {
+                cursorGlow.style.left = `${e.clientX}px`;
+                cursorGlow.style.top = `${e.clientY}px`;
+            }
+        });
+        
+        document.addEventListener('mousedown', () => cursorGlow && cursorGlow.classList.add('active'));
+        document.addEventListener('mouseup', () => cursorGlow && cursorGlow.classList.remove('active'));
+
+        // Search Button Ripple Effect
+        const searchBtn = document.querySelector('.search-btn');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const diameter = Math.max(this.clientWidth, this.clientHeight);
+                const radius = diameter / 2;
+                
+                const ripple = document.createElement('span');
+                ripple.style.width = ripple.style.height = `${diameter}px`;
+                ripple.style.left = `${e.clientX - rect.left - radius}px`;
+                ripple.style.top = `${e.clientY - rect.top - radius}px`;
+                ripple.classList.add('ripple');
+                
+                const existingRipple = this.querySelector('.ripple');
+                if (existingRipple) {
+                    existingRipple.remove(); // Clean up old ripples early if rapidly clicked
+                }
+                
+                this.appendChild(ripple);
+                setTimeout(() => ripple && ripple.remove(), 600); // Remove after animation
+            });
+        }
+
+        // Spotlight Hover Effect on Detail Cards
+        const detailCards = document.querySelectorAll('.detail-card');
+        detailCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--spotlight-x', `${x}px`);
+                card.style.setProperty('--spotlight-y', `${y}px`);
+            });
+        });
     }
     
     checkAPIKey() {
@@ -129,8 +208,8 @@ class WeatherApp {
         this.hideLoading();
         this.hideError();
         
-        // Update location information
-        this.elements.cityName.textContent = data.name;
+        // Update location information with typing effect
+        this.typeText(this.elements.cityName, data.name, 60);
         this.elements.countryName.textContent = data.sys.country;
         
         // Update weather icon
@@ -138,8 +217,10 @@ class WeatherApp {
         this.elements.weatherIcon.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
         this.elements.weatherIcon.alt = data.weather[0].description;
         
-        // Update temperature
-        this.elements.temperature.textContent = Math.round(data.main.temp);
+        // Update temperature with counting animation
+        const targetTemp = Math.round(data.main.temp);
+        this.animateValue(this.elements.temperature, 0, targetTemp, 1500);
+        
         this.elements.feelsLike.textContent = `${Math.round(data.main.feels_like)}°C`;
         
         // Update weather description
@@ -163,6 +244,48 @@ class WeatherApp {
         
         // Add weather animation
         this.addWeatherAnimation(data.weather[0].main);
+    }
+    
+    // Smooth counting animation for numbers
+    animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            // easeOutQuart
+            const easeProgress = 1 - Math.pow(1 - progress, 4);
+            element.textContent = Math.floor(easeProgress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                element.textContent = end;
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+    
+    // Typewriter effect for text
+    typeText(element, text, speed = 50) {
+        element.textContent = '';
+        let i = 0;
+        element.style.borderRight = '3px solid var(--accent)';
+        const blinkInterval = setInterval(() => {
+            element.style.borderColor = element.style.borderColor === 'transparent' ? 'var(--accent)' : 'transparent';
+        }, 400);
+        
+        const type = () => {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            } else {
+                setTimeout(() => { 
+                    clearInterval(blinkInterval);
+                    element.style.borderRight = 'transparent';
+                }, 1500);
+            }
+        };
+        type();
     }
     
     showLoading() {
@@ -737,3 +860,5 @@ if ('serviceWorker' in navigator) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = WeatherApp;
 }
+
+
